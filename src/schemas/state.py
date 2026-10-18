@@ -24,6 +24,8 @@ class CriticEvaluation(BaseModel):
 
 class AgentState(TypedDict):
     query: str
+    intent: Optional[str]
+    intent_reasoning: Optional[str]
     plan: List[Dict[str, Any]]
     raw_findings: List[Dict[str, Any]]
     verified_findings: List[Dict[str, Any]]

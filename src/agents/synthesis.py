@@ -3,45 +3,65 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.agents.llm_factory import get_llm
 from src.schemas.state import AgentState
 
-SYNTHESIS_PROMPT = """You are the Lead Scientific & Technical Writer in a research team.
-Your objective is to write a comprehensive, rigorous, well-structured research report answering the user's research query based exclusively on verified findings.
+SYNTHESIS_PROMPT = """You are the Principal Scientific Writer & Synthesis Lead in an autonomous research team.
+Your objective is to author an exhaustive, mathematically and architecturally rigorous research report answering the user's research topic.
+Your synthesis must rely strictly on the verified literature and findings provided below.
 
-User Query:
+User Research Topic:
 {query}
 
 Verified Findings & Literature:
 {findings}
 
-Requirements for the Report:
-1. Executive Summary: High-level synthesis of key discoveries.
-2. Background & Theoretical Foundations: Context and primary concepts.
-3. Key Technical Insights & Architecture: In-depth technical breakdown.
-4. Open Challenges & Future Directions: Critical analysis of unresolved limitations.
-5. References & Source Traceability: List every referenced source with its title and link matching the inline numbers [1], [2], etc.
+Mandatory Report Structure:
+1. Executive Summary: Core thesis, breakthrough implications, and high-level synthesis of findings.
+2. Theoretical Foundations & Algorithmic Mechanics: In-depth exploration of core principles, architectures, and mechanisms.
+3. Comparative Analysis & Empirical Benchmarks: Quantitative comparisons, empirical metrics, strengths vs weaknesses of competing approaches.
+4. Critical Bottlenecks & Open Questions: Computational overhead, failure modes, safety/alignment concerns, and unresolved theoretical barriers.
+5. Strategic Outlook & Future Directions: Roadmap for the next 2-5 years.
 
-Style Guidelines:
-- Use formal academic markdown format with bold headings and bullet points.
-- Anchor all key factual assertions to inline citations like [1], [2].
-- DO NOT make up claims that are not supported by the findings.
+Strict Academic Guidelines:
+- Write in dense, clear, publication-grade academic prose with clear markdown headings (`##`, `###`), tables or bullet points where appropriate.
+- Every major technical or empirical claim MUST be explicitly anchored to its inline source citation: e.g., `[1]`, `[2]`.
+- Under NO circumstance hallucinate URLs or citations not present in the verified literature.
+- If findings have limitations or gaps, acknowledge them honestly under the critical analysis section.
 """
 
 def synthesis_node(state: AgentState) -> Dict[str, Any]:
     """Synthesis Agent: Synthesizes verified findings into a cited, comprehensive markdown report."""
     llm = get_llm(temperature=0.3)
     
-    findings = state.get("raw_findings", [])
+    # Prefer verified_findings, fallback to raw_findings
+    raw = state.get("verified_findings") or state.get("raw_findings", [])
+    
+    # Filter out error records
+    findings = [
+        item for item in raw
+        if not item.get("id", "").endswith("_error")
+        and not item.get("id", "").endswith("missing_key")
+        and len(item.get("content", "").strip()) > 20
+    ]
     
     # Format numbered sources
     sources_text = []
     citations = []
-    for i, item in enumerate(findings):
-        idx = i + 1
-        title = item.get("title", f"Source {idx}")
-        url = item.get("url", "#")
-        content = item.get("content", "")
+    seen_urls = set()
+    
+    idx = 1
+    for item in findings:
+        url = item.get("url", "").strip()
+        if url and url in seen_urls:
+            continue
+        if url:
+            seen_urls.add(url)
+            
+        title = item.get("title", f"Source {idx}").strip()
+        content = item.get("content", "").strip()
         source_type = item.get("source_type", "web")
+        
         sources_text.append(f"[{idx}] ({source_type.upper()}) {title}\nURL: {url}\nExcerpt: {content}\n")
-        citations.append({"index": idx, "title": title, "url": url, "source_type": source_type})
+        citations.append({"index": idx, "title": title, "url": url or "#", "source_type": source_type})
+        idx += 1
         
     prompt = ChatPromptTemplate.from_template(SYNTHESIS_PROMPT)
     chain = prompt | llm

@@ -5,10 +5,11 @@ Minor Project II — Implementation
 An autonomous multi-agent research assistant built using **LangGraph**, **Google Gemini**, **Tavily Web Search**, and **arXiv API**, complete with an interactive **Chainlit UI**.
 
 ### System Architecture
-1. **Planner Agent:** Decomposes open-ended topics into targeted sub-questions.
-2. **Researcher Agent:** Executes parallel searches across live web and academic literature.
-3. **Critic / Verification Agent:** Fact-checks evidence, detects contradictions, and initiates feedback re-search loops if information is deficient.
-4. **Synthesis Agent:** Drafts an academic-style report with inline citations `[1]`, `[2]` and source traceability.
+1. **Intent Triage & Router Agent:** Evaluates incoming user queries to differentiate between casual conversation/banter/greetings and genuine research questions. Handles conversational queries directly with wit and personality, while scoping and refining complex research queries.
+2. **Planner Agent:** Decomposes open-ended topics into targeted sub-questions across academic (arXiv) and real-world (Web) tracks.
+3. **Researcher Agent:** Executes parallel searches across live web and academic literature using ThreadPool concurrency.
+4. **Critic / Verification Agent:** Fact-checks evidence, filters noise, detects contradictions, and initiates feedback re-search loops if information is deficient.
+5. **Synthesis Agent:** Drafts an academic-style report with inline citations `[1]`, `[2]`, deduplicated references, and automated PDF export.
 
 ---
 

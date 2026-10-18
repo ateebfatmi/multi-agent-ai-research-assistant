@@ -1,9 +1,17 @@
 from langgraph.graph import StateGraph, END
 from src.schemas.state import AgentState
+from src.agents.router import router_node
 from src.agents.planner import planner_node
 from src.agents.researcher import researcher_node
 from src.agents.critic import critic_node
 from src.agents.synthesis import synthesis_node
+
+def route_intent(state: AgentState) -> str:
+    """Conditional edge after router: conversational / direct QA skips research pipeline."""
+    intent = state.get("intent", "research")
+    if intent in ("conversational", "direct_qa"):
+        return END
+    return "planner"
 
 def decide_next_step(state: AgentState) -> str:
     """Conditional edge: check if Critic approved findings or if retry limit reached."""
@@ -22,13 +30,24 @@ def create_research_graph():
     workflow = StateGraph(AgentState)
     
     # Register Nodes
+    workflow.add_node("router", router_node)
     workflow.add_node("planner", planner_node)
     workflow.add_node("researcher", researcher_node)
     workflow.add_node("critic", critic_node)
     workflow.add_node("synthesis", synthesis_node)
     
     # Define Graph Edges
-    workflow.set_entry_point("planner")
+    workflow.set_entry_point("router")
+    
+    workflow.add_conditional_edges(
+        "router",
+        route_intent,
+        {
+            "planner": "planner",
+            END: END
+        }
+    )
+    
     workflow.add_edge("planner", "researcher")
     workflow.add_edge("researcher", "critic")
     
@@ -45,3 +64,4 @@ def create_research_graph():
     workflow.add_edge("synthesis", END)
     
     return workflow.compile()
+

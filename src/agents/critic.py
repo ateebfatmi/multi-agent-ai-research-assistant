@@ -18,16 +18,17 @@ Raw Evidence Gathered:
 Current Retry Count: {retry_count}
 
 Evaluation Criteria:
-1. Are the key aspects of the user query covered by the sources?
-2. Are the findings consistent, or do they contain obvious contradictions/low-quality noise?
-3. If this is already retry 2 or higher, prioritize marking is_sufficient = True to avoid infinite looping, unless the findings are completely empty.
+1. Coverage: Are core technical aspects, mechanisms, and real-world implications adequately backed by the sources?
+2. Quality & Factuality: Are the excerpts substantive, authoritative, and consistent, or are they mere surface-level noise or error messages?
+3. Termination Guard: If retry_count >= 2, mark is_sufficient = True to prevent infinite loops, unless absolutely zero usable evidence was found.
 
-If evidence is insufficient or misses critical angles, set is_sufficient = False, provide constructive critique, and suggest 1 to 2 targeted refinement_queries for re-search.
-Otherwise, set is_sufficient = True.
+Decision:
+- If evidence has major gaps or misses critical angles, set is_sufficient = False, explain the precise missing gap in 'critique', and formulate 1-2 targeted 'refinement_queries'.
+- Otherwise, set is_sufficient = True with constructive synthesis guidance.
 """
 
 def critic_node(state: AgentState) -> Dict[str, Any]:
-    """Critic Agent: Evaluates factual completeness and decides whether to re-research."""
+    """Critic Agent: Evaluates factual completeness, filters valid evidence, and controls re-search loops."""
     llm = get_llm(temperature=0.1)
     structured_llm = llm.with_structured_output(CriticEvaluation)
     
@@ -35,24 +36,31 @@ def critic_node(state: AgentState) -> Dict[str, Any]:
     chain = prompt | structured_llm
     
     retry_count = state.get("retry_count", 0)
+    raw_findings = state.get("raw_findings", [])
     
-    # Format evidence for prompt
+    # Filter out error entries or uninformative blanks
+    valid_findings = [
+        item for item in raw_findings
+        if not item.get("id", "").endswith("_error")
+        and not item.get("id", "").endswith("missing_key")
+        and len(item.get("content", "").strip()) > 30
+    ]
+    
     findings_str = "\n".join([
         f"- [{item.get('source_type', 'web').upper()}] {item.get('title')}: {item.get('content')[:350]}..."
-        for item in state.get("raw_findings", [])
+        for item in valid_findings
     ])
     
     evaluation: CriticEvaluation = chain.invoke({
         "query": state["query"],
         "plan": str(state.get("plan", [])),
-        "findings": findings_str if findings_str else "No evidence found.",
+        "findings": findings_str if findings_str else "No valid evidence retrieved.",
         "retry_count": retry_count
     })
     
-    verified = state.get("raw_findings", []) if evaluation.is_sufficient else state.get("verified_findings", [])
-    
+    # Store verified findings when sufficient, or pass accumulated valid findings
     return {
         "critic_evaluation": evaluation.model_dump(),
-        "verified_findings": verified,
+        "verified_findings": valid_findings if valid_findings else raw_findings,
         "retry_count": retry_count + 1
     }

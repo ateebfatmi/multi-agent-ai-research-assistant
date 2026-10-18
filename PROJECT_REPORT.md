@@ -11,9 +11,10 @@ State-of-the-art single-prompt Large Language Models (LLMs) suffer from inherent
 3. Lack of persistent source traceability and verifiable citations.
 
 This project implements an autonomous **Agentic AI System** using **LangGraph** that models the collaborative workflow of a human scientific research team:
-- **Orchestrator / Planner Agent**: Decomposes complex queries into sub-domains.
+- **Intent Triage & Router Agent**: Analyzes incoming user messages to differentiate between conversational small talk/banter and legitimate research questions, dynamically pruning pipeline execution for non-research inputs.
+- **Orchestrator / Planner Agent**: Decomposes complex queries into sub-domains across academic and web tracks.
 - **Parallel Researcher Agent**: Simultaneously queries live web repositories (Tavily) and academic literature (arXiv).
-- **Critic / Verification Agent**: Detects logical gaps, validates evidence consistency, and triggers cyclic re-search loops.
+- **Critic / Verification Agent**: Detects logical gaps, validates evidence consistency, filters out errors, and triggers cyclic re-search loops.
 - **Synthesis Agent**: Compiles verified discoveries into an academic report with traceable bibliographic references and automated PDF export.
 
 ---
@@ -22,32 +23,38 @@ This project implements an autonomous **Agentic AI System** using **LangGraph** 
 
 ### 2.1 Workflow Graph Representation
 ```
-               [ User Research Query ]
-                          │
-                          ▼
-             [ 🧭 1. Planner Agent ]
-        (Decomposes into Web & arXiv Tasks)
-                          │
-                          ▼
-          [ 🔎 2. Parallel Researcher Agent ]
-     (Concurrent execution across Tavily & arXiv)
-                          │
-                          ▼
-          [ ⚖️ 3. Critic & Verifier Agent ]
-      Checks factual consistency & completeness
-                          │
-        ┌─────────────────┴─────────────────┐
-        │ [Failed / Evidence Gap]           │ [Passed Verification]
-        ▼                                   ▼
- [ Targeted Re-search Loop ]    [ ✍️ 4. Synthesis Agent ]
-  (Max loop limit = 2)           (Drafts academic markdown)
-                                            │
-                                            ▼
-                               [ Traceable Bibliography & ]
-                               [ PDF Exporter (ReportLab) ]
-                                            │
-                                            ▼
-                                 [ Chainlit UI Streaming ]
+                     [ User Input ]
+                           │
+                           ▼
+              [ 🧠 Intent Router Agent ]
+                           │
+           ┌───────────────┴───────────────┐
+           │ (Conversational / Banter)     │ (Research Topic)
+           ▼                               ▼
+  [ Direct Response ]            [ 🧭 1. Planner Agent ]
+           │                 (Decomposes into Web & arXiv Tasks)
+           │                               │
+           │                               ▼
+           │                 [ 🔎 2. Parallel Researcher Agent ]
+           │            (Concurrent execution across Tavily & arXiv)
+           │                               │
+           │                               ▼
+           │                 [ ⚖️ 3. Critic & Verifier Agent ]
+           │             Checks factual consistency & completeness
+           │                               │
+           │             ┌─────────────────┴─────────────────┐
+           │             │ [Failed / Evidence Gap]           │ [Passed Verification]
+           │             ▼                                   ▼
+           │      [ Targeted Re-search Loop ]    [ ✍️ 4. Synthesis Agent ]
+           │       (Max loop limit = 2)           (Drafts academic markdown)
+           │                                                 │
+           │                                                 ▼
+           │                                    [ Traceable Bibliography & ]
+           │                                    [ PDF Exporter (ReportLab) ]
+           │                                                 │
+           └───────────────────────┬─────────────────────────┘
+                                   ▼
+                        [ Chainlit UI Streaming ]
 ```
 
 ### 2.2 Shared State (`AgentState`)

@@ -40,9 +40,15 @@ def search_tavily(query: str, max_results: int = 3) -> List[Dict[str, Any]]:
 def search_arxiv(query: str, max_results: int = 2) -> List[Dict[str, Any]]:
     """Search academic research papers using arXiv API."""
     try:
+        # Clean query: strip punctuation and truncate overly long phrases that degrade arXiv relevance
+        clean_query = query.replace('"', '').replace("'", '').replace(":", " ").replace("-", " ")
+        words = clean_query.split()
+        if len(words) > 12:
+            clean_query = " ".join(words[:12])
+            
         client = arxiv.Client()
         search = arxiv.Search(
-            query=query,
+            query=clean_query,
             max_results=max_results,
             sort_by=arxiv.SortCriterion.Relevance
         )

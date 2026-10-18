@@ -17,11 +17,12 @@ async def on_chat_start():
             "### 🔬 Multi-Agent Research Assistant (Agentic AI System)\n"
             "*Minor Project II — Powered by LangGraph & Google Gemini*\n\n"
             "**Architecture:**\n"
-            "- 🧭 **Planner Agent:** Decomposes research topics into structured subtasks.\n"
+            "- 🧠 **Intent Triage & Router Agent:** Intelligently screens queries, handles conversational banter/chit-chat directly, and scopes academic research tasks.\n"
+            "- 🧭 **Planner Agent:** Decomposes complex research topics into targeted sub-investigations.\n"
             "- 🔎 **Researcher Agent:** Concurrently queries **Tavily (Web)** and **arXiv (Academic)**.\n"
             "- ⚖️ **Critic / Verifier:** Validates factual claims, checks source reliability & triggers re-search loops.\n"
             "- ✍️ **Synthesis Agent:** Drafts an academic report with inline traceable citations.\n\n"
-            "💡 *Enter any research topic below to begin autonomous research.*"
+            "💡 *Enter any research topic below to begin autonomous research, or ask a question!*"
         )
     ).send()
 
@@ -31,6 +32,8 @@ async def on_message(message: cl.Message):
     
     initial_state = {
         "query": user_query,
+        "intent": "research",
+        "intent_reasoning": "",
         "plan": [],
         "raw_findings": [],
         "verified_findings": [],
@@ -40,15 +43,27 @@ async def on_message(message: cl.Message):
         "citations": []
     }
     
+    current_state = initial_state
+    
     # Visualizing Multi-Agent Execution Steps in Real-Time
-    async with cl.Step(name="🚀 Autonomous Multi-Agent Research") as root_step:
-        current_state = initial_state
-        
+    async with cl.Step(name="🚀 Autonomous Multi-Agent System") as root_step:
         for event in research_graph.stream(initial_state):
             for node_name, node_output in event.items():
                 current_state.update(node_output)
                 
-                if node_name == "planner":
+                if node_name == "router":
+                    intent = current_state.get("intent", "research")
+                    reasoning = current_state.get("intent_reasoning", "")
+                    if intent in ("conversational", "direct_qa"):
+                        root_step.name = "💬 Conversational Agent"
+                        async with cl.Step(name="🧠 Intent Triage: Direct Conversation", parent_id=root_step.id) as step:
+                            step.output = f"**Classification:** `{intent.upper()}`\n**Analysis:** {reasoning}"
+                    else:
+                        async with cl.Step(name="🧠 0. Intent Triage & Scoping Agent", parent_id=root_step.id) as step:
+                            refined = current_state.get("query", user_query)
+                            step.output = f"**Status:** Confirmed Academic/Technical Research\n**Analysis:** {reasoning}\n**Scoped Topic:** `{refined}`"
+
+                elif node_name == "planner":
                     async with cl.Step(name="🧭 1. Orchestrator / Planner Agent", parent_id=root_step.id) as step:
                         tasks = current_state.get("plan", [])
                         plan_md = "\n".join([f"- **[{t.get('source_type', 'web').upper()}]** {t.get('topic')}" for t in tasks])
@@ -78,10 +93,15 @@ async def on_message(message: cl.Message):
                     async with cl.Step(name="✍️ 4. Synthesis & Technical Writer Agent", parent_id=root_step.id) as step:
                         step.output = "Drafted comprehensive report with numbered citations `[1]`, `[2]` and bibliography."
 
-    # Final Report Assembly
-    final_report = current_state.get("final_report", "Research completed, but report synthesis was empty.")
+    intent = current_state.get("intent", "research")
+    final_report = current_state.get("final_report", "Research completed, but response was empty.")
     
-    # Formatted Citations Section
+    # If the user engaged in small talk, banter, or a direct question, send clean direct response
+    if intent in ("conversational", "direct_qa"):
+        await cl.Message(content=final_report).send()
+        return
+
+    # Final Report Assembly with Formatted Citations Section for Research Queries
     citations = current_state.get("citations", [])
     if citations:
         sources_md = "\n\n---\n### 📚 Traceable Sources & References\n"

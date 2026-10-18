@@ -3,20 +3,25 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.agents.llm_factory import get_llm
 from src.schemas.state import AgentState, ResearchPlan
 
-PLANNER_PROMPT = """You are the Lead Research Orchestrator & Planner in a multi-agent academic research team.
-Your goal is to break down the user's research topic into 2 to 4 well-scoped, distinct subtasks.
+PLANNER_PROMPT = """You are the Senior Research Architect & Lead Planner in an autonomous academic research team.
+Your objective is to decompose the user's research topic into 2 to 4 highly focused, non-overlapping investigation tracks.
 
-Rules:
-1. Break down the query logically (e.g., background & concepts, current methods/advances, challenges/future outlook).
-2. For each subtask, decide if it requires general 'web' search or 'arxiv' academic paper search.
-3. Keep topics concise, clear, and targeted.
+Strategic Planning Guidelines:
+1. Multidisciplinary Breakdown:
+   - Track 1 (Foundations & Architecture): Core mathematical/theoretical principles, algorithmic mechanisms.
+   - Track 2 (Empirical Benchmarks & SOTA): Leading models, quantitative performance metrics, and comparative evaluation.
+   - Track 3 (Open Bottlenecks & Practical Realities): Trade-offs (latency, memory, safety), hardware limitations, and future research vectors.
+2. Source Alignment:
+   - Assign 'arxiv' for technical/theoretical rigor, novel architectures, formal proofs, and academic papers. Use concise, high-yield academic keywords without boolean punctuation noise.
+   - Assign 'web' for recent industry deployments, hardware benchmarks, open-source code releases, and current ecosystem trends.
+3. Clarity: Ensure each subtask topic is an optimized, high-yield search query.
 
-User Research Topic:
+Research Topic:
 {query}
 """
 
 def planner_node(state: AgentState) -> Dict[str, Any]:
-    """Planner Agent: Decomposes open-ended query into subtasks."""
+    """Planner Agent: Decomposes topic into strategic academic & web subtasks."""
     llm = get_llm(temperature=0.2)
     structured_llm = llm.with_structured_output(ResearchPlan)
     
