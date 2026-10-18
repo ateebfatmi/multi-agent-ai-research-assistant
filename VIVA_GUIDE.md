@@ -29,6 +29,7 @@ We use a centralized TypedDict state schema (`AgentState`) containing:
 
 | Agent | Responsibility | Implementation Node |
 | :--- | :--- | :--- |
+| **Intent Triage & Router** | Distinguishes between conversational chit-chat/banter and academic inquiries, pruning pipeline execution and providing direct witty responses for non-research queries. | `router_node` |
 | **Planner / Orchestrator** | Breaks open-ended questions into 2–4 targeted subtasks, tagging each as `web` or `arxiv`. | `planner_node` |
 | **Parallel Researcher** | Dispatches asynchronous threads to fetch from Tavily (web) and arXiv (academic papers) simultaneously. | `researcher_node` |
 | **Critic / Verifier** | Inspects raw findings for hallucination, conflicting data, and query completeness. | `critic_node` |
