@@ -1,0 +1,301 @@
+/* ==========================================================================
+   Autonomous Multi-Agent AI Research Assistant - Premium UI Theme
+   Designed for High-End Academic & Research Systems (Dark & Light Mode)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* --- Root Variables & Design Tokens --- */
+:root {
+  --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --primary: #4f46e5;
+  --primary-light: #6366f1;
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+  --accent-glow: rgba(99, 102, 241, 0.18);
+  
+  /* Agent Distinctive Accents */
+  --agent-router: #8b5cf6;
+  --agent-planner: #06b6d4;
+  --agent-researcher: #10b981;
+  --agent-critic: #f59e0b;
+  --agent-synthesis: #f43f5e;
+}
+
+/* --- Base Body & Background Typography --- */
+html, body {
+  font-family: var(--font-main) !important;
+  letter-spacing: -0.012em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, pre, kbd {
+  font-family: var(--font-mono) !important;
+}
+
+/* Background Atmosphere */
+body {
+  background-attachment: fixed;
+  background-color: #f8fafc !important;
+  background-image: radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.04) 0px, transparent 40%) !important;
+}
+
+.dark body {
+  background-color: #090d16 !important;
+  background-image: radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 60%),
+                    radial-gradient(at 100% 10%, rgba(139, 92, 246, 0.08) 0px, transparent 50%) !important;
+}
+
+/* --- Header & Top Bar Glassmorphism --- */
+header {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.dark header {
+  background: rgba(9, 13, 22, 0.8) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* --- Input Area & Floating Message Composer --- */
+#chat-input-container, form[data-testid="chat-input"] {
+  border-radius: 20px !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#chat-input {
+  border-radius: 16px !important;
+  font-size: 0.96rem !important;
+  padding: 12px 18px !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.dark #chat-input {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.35) !important;
+}
+
+#chat-input:focus-within {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18), 0 8px 30px -4px rgba(99, 102, 241, 0.12) !important;
+}
+
+/* Send & Action Buttons */
+button[type="submit"] {
+  border-radius: 12px !important;
+  background: var(--primary-gradient) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+}
+
+/* --- Multi-Agent Execution Steps Card Styling --- */
+.step, div[data-testid="step"] {
+  border-radius: 14px !important;
+  border: 1px solid rgba(226, 232, 240, 0.85) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  margin-bottom: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  overflow: hidden !important;
+}
+
+.dark .step, .dark div[data-testid="step"] {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(15, 23, 42, 0.55) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.step:hover, div[data-testid="step"]:hover {
+  transform: translateY(-1px);
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.08) !important;
+}
+
+/* --- Starters & Quick Prompts Styling --- */
+button[data-testid="starter"], div[data-testid="starter-container"] button {
+  border-radius: 14px !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  padding: 14px 18px !important;
+}
+
+.dark button[data-testid="starter"], .dark div[data-testid="starter-container"] button {
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: rgba(17, 24, 39, 0.65) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+button[data-testid="starter"]:hover, div[data-testid="starter-container"] button:hover {
+  transform: translateY(-2px);
+  border-color: #6366f1 !important;
+  box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* --- Typography & Academic Research Markdown Reports --- */
+.message-content h1 {
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  margin-top: 1.2em !important;
+  margin-bottom: 0.6em !important;
+  color: #1e293b;
+}
+
+.dark .message-content h1 {
+  color: #f1f5f9 !important;
+}
+
+.message-content h2 {
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  margin-top: 1.8em !important;
+  margin-bottom: 0.5em !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1.5px solid rgba(99, 102, 241, 0.2) !important;
+  color: #3b82f6 !important;
+}
+
+.dark .message-content h2 {
+  color: #818cf8 !important;
+  border-bottom-color: rgba(129, 140, 248, 0.25) !important;
+}
+
+.message-content h3 {
+  font-size: 1.12rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  margin-top: 1.3em !important;
+  color: #0f172a;
+}
+
+.dark .message-content h3 {
+  color: #e2e8f0 !important;
+}
+
+.message-content p {
+  line-height: 1.72 !important;
+  margin-bottom: 1em !important;
+  color: #334155;
+}
+
+.dark .message-content p {
+  color: #cbd5e1 !important;
+}
+
+/* Blockquotes styled as Callout cards */
+blockquote {
+  border-left: 4px solid #6366f1 !important;
+  background: rgba(99, 102, 241, 0.05) !important;
+  border-radius: 0 10px 10px 0 !important;
+  padding: 12px 18px !important;
+  margin: 16px 0 !important;
+  font-style: normal !important;
+}
+
+.dark blockquote {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-left-color: #818cf8 !important;
+}
+
+/* Modern Tables */
+table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  margin: 18px 0 !important;
+  overflow: hidden !important;
+}
+
+.dark table {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+th {
+  background: rgba(241, 245, 249, 0.8) !important;
+  font-weight: 600 !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+  text-align: left !important;
+}
+
+.dark th {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+td {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.6) !important;
+}
+
+.dark td {
+  border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Citation Badges [1], [2] in Report Text */
+a[href*="arxiv.org"], a[href*="http://"], a[href*="https://"] {
+  color: #4f46e5 !important;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(79, 70, 229, 0.5);
+  transition: all 0.15s ease-in-out;
+}
+
+.dark a[href*="arxiv.org"], .dark a[href*="http://"], .dark a[href*="https://"] {
+  color: #93c5fd !important;
+  border-bottom-color: rgba(147, 197, 253, 0.4);
+}
+
+a[href*="arxiv.org"]:hover, a[href*="https://"]:hover {
+  border-bottom-style: solid;
+  color: #6366f1 !important;
+}
+
+/* Slim Modern Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
