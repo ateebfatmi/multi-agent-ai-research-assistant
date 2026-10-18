@@ -1,7 +1,7 @@
 import os
 import json
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from src.agents.llm_factory import get_llm
 from src.graph import create_research_graph
 
 load_dotenv()
@@ -23,7 +23,7 @@ def run_baseline_single_prompt(query: str, llm):
 
 def run_benchmark():
     print("=== Multi-Agent Research Assistant vs Single-Prompt Baseline Evaluation ===\n")
-    llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash", temperature=0.2, google_api_key=os.getenv("GEMINI_API_KEY"))
+    llm = get_llm(temperature=0.2)
     graph = create_research_graph()
     
     results = []
