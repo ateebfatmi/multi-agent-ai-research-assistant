@@ -8,6 +8,9 @@ from src.utils.exporter import export_report_to_pdf
 
 load_dotenv()
 
+# Ensure Chainlit local storage directory exists to prevent FileNotFoundError on file uploads/exports
+os.makedirs(".files", exist_ok=True)
+
 # Precompile the LangGraph workflow
 research_graph = create_research_graph()
 

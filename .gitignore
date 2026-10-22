@@ -4,5 +4,6 @@ __pycache__/
 *.pyc
 .chainlit/*
 !.chainlit/config.toml
-.files/
+.files/*
+!.files/.gitkeep
 .DS_Store
